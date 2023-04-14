@@ -27,8 +27,7 @@
     let isGameActive = false;
     let timerId;
 
-    $statTotal.textContent = cellCount;
-    updateStat(0, cellCount, '-');
+    updateStat();
 
     for ( let index = 0, $cell, row, column; index < cellCount; index += 1 ) {
         $cell = document.createElement('div');
@@ -39,8 +38,6 @@
         matrix[row][column] = $cell;
         $fragment.appendChild($cell);
     }
-
-    console.log(matrix);
 
     $gameField.appendChild($fragment);
 
@@ -75,7 +72,7 @@
             $cell.classList.remove(activeCellClassName);
             $cell.state = 0;
         });
-        updateStat(0, cellCount, '-');
+        updateStat();
     });
 
     function live ( state ) {
@@ -117,8 +114,15 @@
     }
 
     function updateStat (live, dead, time) {
-        $statLive.textContent = (+$statLive.textContent || 0) + live;
-        $statDead.textContent = (+$statDead.textContent || 0) + dead;
-        $statTime.textContent = time;
+        if (arguments.length) {
+            $statLive.textContent = (+$statLive.textContent || 0) + live;
+            $statDead.textContent = (+$statDead.textContent || 0) + dead;
+            $statTime.textContent = time;
+        } else {
+            $statTotal.textContent = cellCount;
+            $statLive.textContent = 0;
+            $statDead.textContent = cellCount;
+            $statTime.textContent = '-';
+        }
     }
 })();
