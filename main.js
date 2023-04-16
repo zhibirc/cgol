@@ -79,6 +79,8 @@
         if ( state ) {
             let startTime = Date.now();
             timerId = setInterval(() => {
+                const toLive = [];
+                const toDie = [];
                 for ( let x = 0, $cell; x < vh; x += 1 ) {
                     for ( let y = 0; y < vw; y += 1 ) {
                         $cell = matrix[x][y];
@@ -95,18 +97,20 @@
                         const liveSiblings = [s1, s2, s3, s4, s5, s6, s7, s8].filter(s => s.state === 1);
 
                         if ( $cell.state ) {
-                            if ( liveSiblings.length < 2 || liveSiblings.length > 3 ) {
-                                $cell.state = 0;
-                                $cell.classList.remove(activeCellClassName);
-                                updateStat(-1, 1, `${(Date.now() - startTime) / 1_000 | 0}s`);
-                            }
-                        } else if ( liveSiblings.length === 3 ) {
-                            $cell.state = 1;
-                            $cell.classList.add(activeCellClassName);
-                            updateStat(1, -1, `${(Date.now() - startTime) / 1_000 | 0}s`);
-                        }
+                            if ( liveSiblings.length < 2 || liveSiblings.length > 3 ) toDie.push($cell);
+                        } else if ( liveSiblings.length === 3 ) toLive.push($cell);
                     }
                 }
+                toLive.forEach($cell => {
+                    $cell.state = 1;
+                    $cell.classList.add(activeCellClassName);
+                    updateStat(1, -1, `${(Date.now() - startTime) / 1_000 | 0}s`);
+                });
+                toDie.forEach($cell => {
+                    $cell.state = 0;
+                    $cell.classList.remove(activeCellClassName);
+                    updateStat(-1, 1, `${(Date.now() - startTime) / 1_000 | 0}s`);
+                });
             }, DELAY_MS);
         } else {
             clearInterval(timerId);
