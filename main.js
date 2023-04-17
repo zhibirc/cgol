@@ -1,13 +1,11 @@
 /**
  * Engine of Conway's Game of Life.
+ * @author Yaroslav Surilov <zhibirc.echo@gmail.com>
  */
 (() => {
-    /** Configuration. */
-
     // delay in ms between generational permutations
     const DELAY_MS = 1_000;
 
-    /** DOM elements. */
     const $gameField = document.getElementById('game-field');
     const $fragment = document.createDocumentFragment();
     const $runButton = document.getElementById('start-stop');
@@ -16,6 +14,8 @@
     const $statLive = document.getElementById('live');
     const $statDead = document.getElementById('dead');
     const $statTime = document.getElementById('time');
+    const $delayInput = document.getElementById('delay');
+    const $delayChosen = document.getElementById('delay-chosen');
 
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0) / 20 | 0;
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) / 20 | 0;
@@ -28,6 +28,7 @@
     let timerId;
 
     updateStat();
+    $delayChosen.textContent = $delayInput.value = DELAY_MS;
 
     for ( let index = 0, $cell, row, column; index < cellCount; index += 1 ) {
         $cell = document.createElement('div');
@@ -56,11 +57,11 @@
         if ( isGameActive ) {
             isGameActive = false;
             $runButton.textContent = 'START';
-            $clearButton.disabled = false;
+            $clearButton.disabled = $delayInput.disabled = false;
         } else {
             isGameActive = true;
             $runButton.textContent = 'STOP';
-            $clearButton.disabled = true;
+            $clearButton.disabled = $delayInput.disabled = true;
         }
 
         live(isGameActive);
@@ -73,6 +74,9 @@
             $cell.state = 0;
         });
         updateStat();
+    });
+    $delayInput.addEventListener('input', event => {
+        $delayChosen.textContent = event.target.value;
     });
 
     function live ( state ) {
@@ -104,14 +108,14 @@
                 toLive.forEach($cell => {
                     $cell.state = 1;
                     $cell.classList.add(activeCellClassName);
-                    updateStat(1, -1, `${(Date.now() - startTime) / 1_000 | 0}s`);
+                    updateStat(1, -1, (Date.now() - startTime) / 1_000 | 0);
                 });
                 toDie.forEach($cell => {
                     $cell.state = 0;
                     $cell.classList.remove(activeCellClassName);
-                    updateStat(-1, 1, `${(Date.now() - startTime) / 1_000 | 0}s`);
+                    updateStat(-1, 1, (Date.now() - startTime) / 1_000 | 0);
                 });
-            }, DELAY_MS);
+            }, +$delayInput.value);
         } else {
             clearInterval(timerId);
         }
@@ -123,9 +127,8 @@
             $statDead.textContent = (+$statDead.textContent || 0) + dead;
             $statTime.textContent = time;
         } else {
-            $statTotal.textContent = cellCount;
+            $statTotal.textContent = $statDead.textContent = cellCount;
             $statLive.textContent = 0;
-            $statDead.textContent = cellCount;
             $statTime.textContent = '-';
         }
     }
