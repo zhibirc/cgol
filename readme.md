@@ -6,7 +6,7 @@
 
 <h3 align="center">John Horton Conway</h3>
 <p align="center">
-    <img width="800" height="933" src="/assets/images/JHConway.jpg">
+    <img width="400" src="/assets/images/JHConway.jpg">
 </p>
 
 
